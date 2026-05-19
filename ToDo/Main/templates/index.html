@@ -1,337 +1,46 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern ToDo App</title>
+    <title>ToWork</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6C5CE7;
-            --secondary: #A29BFE;
-            --dark: #2D3436;
-            --light: #F9F9F9;
-            --success: #00B894;
-            --danger: #FF7675;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--glass-shadow);
-        }
-
-        h1 {
-            text-align: center;
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: 1px;
-        }
-
-        .input-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: rgba(0,0,0,0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-        }
-        
-        .input-group input, .input-group textarea {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 0.8rem;
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        .input-group textarea {
-            grid-column: 1 / -1;
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .input-group input:focus, .input-group textarea:focus {
-            outline: none;
-            border-color: var(--secondary);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-
-        .add-btn {
-            grid-column: 1 / -1;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-        }
-
-        .todo-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .todo-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            animation: slideIn 0.4s ease forwards;
-        }
-
-        .todo-item:hover {
-            transform: scale(1.02);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .todo-item.completed {
-            opacity: 0.6;
-            border-left: 5px solid var(--success);
-        }
-        .todo-item.completed .task-title {
-            text-decoration: line-through;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .task-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            flex-grow: 1;
-        }
-
-        .task-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .task-desc {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.7);
-            margin: 0;
-        }
-        
-        .task-date {
-            font-size: 0.8rem;
-            color: var(--secondary);
-            font-weight: 600;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 0.8rem;
-        }
-
-        .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0.5rem;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-icon:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
-        }
-
-        .btn-complete { color: var(--success); }
-        .btn-delete { color: var(--danger); }
-
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'Main/css/styles.css' %}">
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>✨ Mis Tareas</h1>
-        
-        <form class="input-group" id="todoForm">
-            <input type="text" id="taskTitle" placeholder="¿Qué necesitas hacer? (Título)" required>
-            <input type="date" id="taskDate" required>
-            <textarea id="taskDesc" placeholder="Descripción de la tarea (Opcional)"></textarea>
-            <button type="submit" class="add-btn">Agregar Tarea</button>
-        </form>
+    <div class="app-layout" id="appLayout">
+        <div class="container" id="mainContainer">
+            <h1>Tareas</h1>
 
-        <ul class="todo-list" id="todoList">
-            <!-- Tareas generadas con JS -->
-        </ul>
+            <form class="input-group" id="todoForm">
+                <input type="text" id="taskTitle" placeholder="¿Qué necesitas hacer?" required>
+                <input type="date" id="taskDate" required>
+                <textarea id="taskDesc" placeholder="Descripción de la tarea (Opcional)"></textarea>
+                <button type="submit" class="add-btn">Agregar Tarea</button>
+            </form>
+
+            <ul class="todo-list" id="todoList">
+                <!-- Tareas generadas con JS -->
+            </ul>
+        </div>
+
+        <div class="detail-container" id="detailContainer">
+            <div class="detail-header">
+                <h2 id="detailTitle">Detalles</h2>
+                <button class="btn-icon" onclick="closeDetail()" title="Cerrar detalles"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="detail-content" id="detailContent">
+                <!-- Información generada con JS -->
+            </div>
+        </div>
     </div>
 
-    <script>
-        const API_URL = '/api/';
-        
-        document.addEventListener('DOMContentLoaded', loadTasks);
-        document.getElementById('todoForm').addEventListener('submit', addTask);
-
-        async function loadTasks() {
-            try {
-                const response = await fetch(API_URL);
-                const tasks = await response.json();
-                renderTasks(tasks);
-            } catch (error) {
-                console.error("Error cargando tareas:", error);
-            }
-        }
-
-        function renderTasks(tasks) {
-            const list = document.getElementById('todoList');
-            list.innerHTML = '';
-            
-            // Ordenar: primero no completadas, luego completadas
-            tasks.sort((a, b) => a.Completado - b.Completado);
-
-            tasks.forEach(task => {
-                const li = document.createElement('li');
-                li.className = `todo-item ${task.Completado ? 'completed' : ''}`;
-                
-                li.innerHTML = `
-                    <div class="task-info">
-                        <h3 class="task-title">${task.Titulo}</h3>
-                        <p class="task-desc">${task.Descripcion || 'Sin descripción'}</p>
-                        <span class="task-date">📅 ${task.Fecha}</span>
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn-icon btn-complete" onclick="toggleTask(${task.id}, ${task.Completado}, '${task.Titulo}', '${task.Descripcion}', '${task.Fecha}')" title="${task.Completado ? 'Desmarcar' : 'Completar'}">
-                            ${task.Completado ? '↩️' : '✅'}
-                        </button>
-                        <button class="btn-icon btn-delete" onclick="deleteTask(${task.id})" title="Eliminar">
-                            🗑️
-                        </button>
-                    </div>
-                `;
-                list.appendChild(li);
-            });
-        }
-
-        async function addTask(e) {
-            e.preventDefault();
-            const title = document.getElementById('taskTitle').value;
-            const desc = document.getElementById('taskDesc').value;
-            const date = document.getElementById('taskDate').value;
-
-            const newTask = {
-                Titulo: title,
-                Descripcion: desc,
-                Fecha: date,
-                Completado: false
-            };
-
-            try {
-                const response = await fetch(`${API_URL}create/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newTask)
-                });
-
-                if(response.ok) {
-                    document.getElementById('todoForm').reset();
-                    loadTasks();
-                }
-            } catch (error) {
-                console.error("Error agregando tarea:", error);
-            }
-        }
-
-        async function toggleTask(id, isCompleted, title, desc, date) {
-            const updatedTask = {
-                Titulo: title,
-                Descripcion: desc,
-                Fecha: date,
-                Completado: !isCompleted
-            };
-
-            try {
-                await fetch(`${API_URL}${id}/`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedTask)
-                });
-                loadTasks();
-            } catch (error) {
-                console.error("Error actualizando tarea:", error);
-            }
-        }
-
-        async function deleteTask(id) {
-            if(!confirm("¿Estás seguro de que deseas eliminar esta tarea?")) return;
-
-            try {
-                await fetch(`${API_URL}delete/${id}/`, {
-                    method: 'DELETE'
-                });
-                loadTasks();
-            } catch (error) {
-                console.error("Error eliminando tarea:", error);
-            }
-        }
-    </script>
+    <script src="{% static 'Main/js/todo.js' %}"></script>
 </body>
+
 </html>
