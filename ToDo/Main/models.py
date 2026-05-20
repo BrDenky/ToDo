@@ -10,6 +10,7 @@ class To_do(models.Model):
     DuracionPomodoro = models.IntegerField(default=25)
     PomodorosCompletados = models.IntegerField(default=0)
     PomodorosEsperados = models.IntegerField(default=1)
+    Apuntes = models.TextField(blank=True, default='')
 
     def __str__(self):
         return self.Titulo

@@ -6,5 +6,5 @@ from .models import To_do   #Serializamos el modelo To_do
 class To_Do_Serializer(serializers.ModelSerializer):
     class Meta:
         model = To_do
-        fields = ['id','Titulo','Descripcion','Fecha','Completado', 'DuracionPomodoro', 'PomodorosCompletados', 'PomodorosEsperados'] #id = Identificador único para cada instancia de To_do
+        fields = ['id','Titulo','Descripcion','Fecha','Completado', 'DuracionPomodoro', 'PomodorosCompletados', 'PomodorosEsperados', 'Apuntes']
         #En fields se puede excluir atributos específicos de la serialización

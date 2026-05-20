@@ -5,6 +5,15 @@ let globalInterval = null;
 let allTasks = [];
 let currentAnchoredTask = null;
 
+window.formatDoc = function(cmd, value = null) {
+    document.execCommand(cmd, false, value);
+    const docsEditor = document.getElementById('docsEditor');
+    if (docsEditor) {
+        docsEditor.focus();
+        docsEditor.dispatchEvent(new Event('input'));
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     loadTasks();
     
@@ -286,6 +295,10 @@ window.anchorTask = function(taskId) {
     currentAnchoredTask = taskId;
     const appLayout = document.getElementById('appLayout');
     appLayout.classList.add('anchored');
+    const appWrapper = document.getElementById('appWrapper');
+    if (appWrapper) {
+        appWrapper.classList.add('anchored');
+    }
     
     const task = allTasks.find(t => t.id === taskId);
     if (!task) return;
@@ -296,41 +309,95 @@ window.anchorTask = function(taskId) {
     const activeClass = timerState.isRunning ? 'active' : '';
 
     const detailContent = document.getElementById('detailContent');
-    document.getElementById('detailTitle').textContent = "Detalles de la Tarea";
     
     detailContent.innerHTML = `
-        <h1 class="detail-task-title">${task.Titulo}</h1>
-        <div class="detail-task-meta">
-            <span class="task-date"><i class="fa-regular fa-calendar-days"></i> ${task.Fecha}</span>
-            <span class="task-status ${task.Completado ? 'completed' : ''}">${task.Completado ? 'Completada ✅' : 'Pendiente ⏳'}</span>
-        </div>
-        
-        <div class="detail-task-desc-box">
-            <h3>Descripción</h3>
-            <p>${task.Descripcion || 'Sin descripción provista.'}</p>
+        <div class="detail-unified-header">
+            <div class="detail-header-left">
+                <h2 class="detail-title-text">${task.Titulo} <span class="detail-title-date">(${task.Fecha})</span></h2>
+                ${task.Descripcion ? `<p class="detail-desc-text"><strong>Descripción:</strong> ${task.Descripcion}</p>` : ''}
+            </div>
+            
+            <div class="detail-header-right">
+                <span class="task-status ${task.Completado ? 'completed' : ''}">${task.Completado ? 'Completada <i class="fa-solid fa-circle-check" style="color: #55efc4; margin-left: 0.4rem;"></i>' : 'Pendiente <i class="fa-regular fa-clock" style="color: #ffeaa7; margin-left: 0.4rem;"></i>'}</span>
+                <div class="pomodoro-container detail-pomo-compact">
+                    <div class="pomodoro-display">
+                        <span id="pomo-display-detail-${task.id}" class="editable-time detail-time-compact"
+                              ${(!task.Completado && !timerState.isRunning) ? 'contenteditable="true"' : ''} 
+                              onblur="parsePomoTime(${task.id}, this.innerText)" 
+                              onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}"
+                              title="Haz clic para editar">${displayTime}</span>
+                    </div>
+                    <div class="pomodoro-controls">
+                        <button class="btn-icon pomo-btn ${activeClass}" onclick="togglePomo(${task.id})" title="Iniciar/Pausar" ${task.Completado ? 'disabled' : ''}>
+                            ${playPauseIcon}
+                        </button>
+                        <button class="btn-icon pomo-btn" onclick="resetPomo(${task.id})" title="Reiniciar" ${task.Completado ? 'disabled' : ''}>
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <div class="pomodoro-sessions" title="Sesiones completadas">
+                            🍅 <span id="pomo-sessions-detail-${task.id}">${timerState.sessions}</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-icon close-detail-btn" onclick="closeDetail()" title="Cerrar detalles"><i class="fa-solid fa-xmark"></i></button>
+            </div>
         </div>
 
-        <div class="pomodoro-container detail-pomo">
-            <div class="pomodoro-display">
-                <span id="pomo-display-detail-${task.id}" class="editable-time detail-time"
-                      ${(!task.Completado && !timerState.isRunning) ? 'contenteditable="true"' : ''} 
-                      onblur="parsePomoTime(${task.id}, this.innerText)" 
-                      onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}"
-                      title="Haz clic para editar">${displayTime}</span>
+        <div class="docs-editor-container">
+            <div class="docs-toolbar">
+                <button class="toolbar-btn" onclick="formatDoc('bold')" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('italic')" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('underline')" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('justifyLeft')" title="Alinear izquierda"><i class="fa-solid fa-align-left"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('justifyCenter')" title="Centrar"><i class="fa-solid fa-align-center"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('justifyRight')" title="Alinear derecha"><i class="fa-solid fa-align-right"></i></button>
+                <button class="toolbar-btn" onclick="formatDoc('insertUnorderedList')" title="Lista con viñetas"><i class="fa-solid fa-list-ul"></i></button>
+                <span class="save-status" id="docSaveStatus">Autoguardado <i class="fa-solid fa-cloud-arrow-up"></i></span>
             </div>
-            <div class="pomodoro-controls">
-                <button class="btn-icon pomo-btn ${activeClass}" onclick="togglePomo(${task.id})" title="Iniciar/Pausar" ${task.Completado ? 'disabled' : ''}>
-                    ${playPauseIcon}
-                </button>
-                <button class="btn-icon pomo-btn" onclick="resetPomo(${task.id})" title="Reiniciar" ${task.Completado ? 'disabled' : ''}>
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-                <div class="pomodoro-sessions" title="Sesiones completadas">
-                    🍅 <span id="pomo-sessions-detail-${task.id}">${timerState.sessions}</span>
+            <div class="docs-page-wrapper">
+                <div class="docs-page" contenteditable="true" id="docsEditor" placeholder="Empieza a escribir tus apuntes aquí...">
+                    ${task.Apuntes || ''}
                 </div>
             </div>
         </div>
     `;
+
+    const docsEditor = document.getElementById('docsEditor');
+    const saveStatus = document.getElementById('docSaveStatus');
+    let saveTimeout = null;
+
+    if (docsEditor) {
+        docsEditor.addEventListener('input', () => {
+            if (saveStatus) {
+                saveStatus.innerHTML = 'Guardando... <i class="fa-solid fa-spinner fa-spin"></i>';
+            }
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(async () => {
+                const newNotes = docsEditor.innerHTML;
+                try {
+                    await fetch(`${API_URL}${taskId}/`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Apuntes: newNotes })
+                    });
+                    
+                    const taskToUpdate = allTasks.find(t => t.id === taskId);
+                    if (taskToUpdate) {
+                        taskToUpdate.Apuntes = newNotes;
+                    }
+                    
+                    if (saveStatus) {
+                        saveStatus.innerHTML = 'Autoguardado <i class="fa-solid fa-cloud-arrow-up"></i>';
+                    }
+                } catch (error) {
+                    console.error("Error saving document:", error);
+                    if (saveStatus) {
+                        saveStatus.innerHTML = '<span style="color: var(--secondary)">Error de guardado <i class="fa-solid fa-triangle-exclamation"></i></span>';
+                    }
+                }
+            }, 1000);
+        });
+    }
     
     document.querySelectorAll('.todo-item').forEach(item => item.classList.remove('selected-task'));
     const taskLi = document.getElementById(`task-item-${taskId}`);
@@ -340,5 +407,9 @@ window.anchorTask = function(taskId) {
 window.closeDetail = function() {
     currentAnchoredTask = null;
     document.getElementById('appLayout').classList.remove('anchored');
+    const appWrapper = document.getElementById('appWrapper');
+    if (appWrapper) {
+        appWrapper.classList.remove('anchored');
+    }
     document.querySelectorAll('.todo-item').forEach(item => item.classList.remove('selected-task'));
 };
