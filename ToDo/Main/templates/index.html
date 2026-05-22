@@ -5,18 +5,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ya Mismo 1.0</title>
+    <title>Rainy1.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'Main/css/styles.css' %}?v=1.1.0">
-    <script src="{% static 'Main/js/theme.js' %}?v=1.1.0"></script>
+    <link rel="stylesheet" href="{% static 'Main/css/styles.css' %}?v=1.7.0">
+    <script src="{% static 'Main/js/theme.js' %}?v=1.2.0"></script>
 </head>
 
 <body class="preload">
 
     <div class="app-wrapper" id="appWrapper">
         <header class="main-header">
-            <div class="header-logo">Ya Mismo</div>
+            <div class="header-logo">Rainy</div>
             <div class="header-nav">
                 <button class="nav-btn" id="reportsBtn"><i class="fa-solid fa-chart-simple"></i> Reportes</button>
                 <button class="nav-btn login-btn" id="loginBtn"><i class="fa-solid fa-user"></i> Iniciar Sesión</button>
@@ -40,6 +40,9 @@
                 <ul class="todo-list" id="todoList">
                     <!-- Tareas generadas con JS -->
                 </ul>
+                <button type="button" id="addQuickTaskBtn" class="quick-add-btn" title="Agregar tarea rápida">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
             </div>
 
             <div class="detail-container" id="detailContainer">
@@ -50,7 +53,16 @@
         </div>
     </div>
 
-    <script src="{% static 'Main/js/todo.js' %}?v=1.1.0"></script>
+    <!-- Menú Contextual para las tareas -->
+    <div id="contextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li id="ctxDuplicate"><i class="fa-regular fa-copy"></i> Duplicar</li>
+            <li id="ctxDelete"><i class="fa-regular fa-trash-can"></i> Eliminar</li>
+            <li id="ctxAddTo" class="disabled"><i class="fa-solid fa-folder-plus"></i> Agregar a...</li>
+        </ul>
+    </div>
+
+    <script src="{% static 'Main/js/todo.js' %}?v=1.7.0"></script>
 </body>
 
 </html>
